@@ -1,21 +1,24 @@
-org: yourorg
-app: yourapp
-service: http-api-node
+org: emeu17
+app: cognitoaws
+service: http-api-node-emeu17
+
+frameworkVersion: "3"
 
 provider:
   name: aws
   runtime: nodejs12.x
   environment:
-    DOMAIN_SUFFIX: your-unique-suffix
+    DOMAIN_SUFFIX: emeu17-test1223
   httpApi:
+    cors: true
     authorizers:
       serviceAuthorizer:
         identitySource: $request.header.Authorization
-        issuerUrl: 
+        issuerUrl:
           Fn::Join:
           - ''
           - - 'https://cognito-idp.'
-            - '${opt:region, self:provider.region}'
+            - '${aws:region}'
             - '.amazonaws.com/'
             - Ref: serviceUserPool
         audience:
@@ -43,15 +46,13 @@ resources:
     serviceUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
-        UserPoolName: service-user-pool-${opt:stage, self:provider.stage}
+        UserPoolName: service-user-pool-${sls:stage}
         UsernameAttributes:
-          - email
-        AutoVerifiedAttributes:
           - email
     serviceUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        ClientName: service-user-pool-client-${opt:stage, self:provider.stage}
+        ClientName: service-user-pool-client-${sls:stage}
         AllowedOAuthFlows:
           - implicit
         AllowedOAuthFlowsUserPoolClient: true
@@ -63,17 +64,17 @@ resources:
           - aws.cognito.signin.user.admin
         UserPoolId:
           Ref: serviceUserPool
-        CallbackURLs: 
+        CallbackURLs:
           - https://localhost:3000
         ExplicitAuthFlows:
           - ALLOW_USER_SRP_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
         GenerateSecret: false
-        SupportedIdentityProviders: 
+        SupportedIdentityProviders:
           - COGNITO
     serviceUserPoolDomain:
-      Type: AWS::Cognito::UserPoolDomain 
+      Type: AWS::Cognito::UserPoolDomain
       Properties:
-        UserPoolId: 
+        UserPoolId:
           Ref: serviceUserPool
-        Domain: service-user-pool-domain-${opt:stage, self:provider.stage}-${self:provider.environment.DOMAIN_SUFFIX}
+        Domain: service-user-pool-domain-${sls:stage}-${self:provider.environment.DOMAIN_SUFFIX}

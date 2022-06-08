@@ -5,8 +5,12 @@ module.exports.get = (event, context, callback) => {
   console.log(event);
   const response = {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify({
-      message: event,
+      message: "You have accessed an authorized route in AWS",
     }),
   };
 
@@ -15,11 +19,15 @@ module.exports.get = (event, context, callback) => {
 
 module.exports.post = (event, context, callback) => {
   console.log(context);
-  console.log(event);  
+  console.log(event);
   const response = {
     statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true,
+    },
     body: JSON.stringify({
-      message: 'Password sent.',
+      message: 'Test of post request.',
     }),
   };
 
